@@ -12,6 +12,7 @@ const app = new cdk.App();
 const deployments = [
   {
     stage: "dev",
+    vpcName: "abc",
     certificateArn: process.env.DEV_ACM_CERT_ARN,
     env: {
       account: process.env.DEV_AWS_ACCOUNT_ID,
@@ -20,6 +21,7 @@ const deployments = [
   },
   {
     stage: "prod",
+    vpcName: "xyz",
     certificateArn: process.env.PROD_ACM_CERT_ARN,
     env: {
       account: process.env.PROD_AWS_ACCOUNT_ID,
@@ -35,10 +37,15 @@ for (const deployment of deployments) {
       throw new Error(`Missing ACM cert for stage: ${deployment.stage}`);
     }
 
-    new MicroServiceStack(app, `${deployment.stage}-MicroServiceStack`, {
-      stage: deployment.stage,
-      certificateArn: deployment.certificateArn,
-      env: deployment.env,
+    new MicroServiceStack({
+      scope: app,
+      id: `${deployment.stage}-MicroServiceStack`,
+      props: {
+        vpcName: deployment.vpcName,
+        stage: deployment.stage,
+        certificateArn: deployment.certificateArn,
+        env: deployment.env,
+      },
     });
 
     console.log(`✅ ${deployment.stage} stack added to app`);

@@ -1,4 +1,4 @@
-// ajv schema object
+// ajv schema object based on the requirment
 export const transactionSchema = {
   type: "object",
   required: ["transaction_id", "amount", "currency", "timestamp", "merchant"],

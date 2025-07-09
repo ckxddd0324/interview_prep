@@ -8,16 +8,23 @@ import * as rds from "aws-cdk-lib/aws-rds";
 import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 
+interface MicroServiceStackConstructorParams {
+  scope: Construct;
+  id: string;
+  props: MicroServiceStackProps;
+}
+
 interface MicroServiceStackProps extends cdk.StackProps {
+  vpcName: string;
   certificateArn: string;
   stage: string;
 }
 
 export class MicroServiceStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: MicroServiceStackProps) {
+  constructor({ scope, id, props }: MicroServiceStackConstructorParams) {
     super(scope, id, props);
 
-    const vpc = this.getVpc();
+    const vpc = this.getVpc(props.vpcName);
     const cluster = this.createEcsCluster(vpc);
     const certificate = acm.Certificate.fromCertificateArn(
       this,
@@ -38,10 +45,12 @@ export class MicroServiceStack extends cdk.Stack {
     this.createMonitoring(fargateService, dbCluster, props.stage);
   }
 
-  private getVpc(): ec2.IVpc {
-    return ec2.Vpc.fromLookup(this, "DefaultVPC", { isDefault: true });
+  // GET VPC name
+  private getVpc(vpcName = "DefaultVPC"): ec2.IVpc {
+    return ec2.Vpc.fromLookup(this, vpcName, { isDefault: true });
   }
 
+  // Create ECS cluster
   private createEcsCluster(vpc: ec2.IVpc): ecs.Cluster {
     return new ecs.Cluster(this, "Cluster", { vpc });
   }

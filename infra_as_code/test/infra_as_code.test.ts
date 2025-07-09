@@ -9,10 +9,15 @@ describe("MicroServiceStack", () => {
 
   function getTemplate() {
     const app = new cdk.App();
-    const stack = new MicroServiceStack(app, "TestStack", {
-      stage,
-      certificateArn,
-      env: { account: "123456789012", region: "us-east-1" },
+    const stack = new MicroServiceStack({
+      scope: app,
+      id: "TestStack",
+      props: {
+        stage,
+        certificateArn,
+        vpcName: "default",
+        env: { account: "123456789012", region: "us-east-1" },
+      },
     });
     return Template.fromStack(stack);
   }

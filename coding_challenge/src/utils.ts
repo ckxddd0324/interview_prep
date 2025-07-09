@@ -1,3 +1,4 @@
+// keep the terminal loop
 export async function streamToString(stream: any): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
